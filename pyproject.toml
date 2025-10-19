@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "fenrir"
+version = "0.1.0"
+description = "Flight & Engagement Kinematics with Real-time Interactive Rendering"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+license = "MIT"
+packages = [
+    { include = "core" },
+    { include = "services" },
+    { include = "ui" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^1.26.0"
+scipy = "^1.11.0"
+matplotlib = "^3.8.0"
+pandas = "^2.2.0"
+streamlit = "^1.37.0"
+pytest = "^8.0.0"
+black = "^24.0.0"
+flake8 = "^7.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.6.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
