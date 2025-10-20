@@ -4,6 +4,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
+import io
+import base64
+import matplotlib
+from streamlit.components.v1 import html
+matplotlib.use("Agg")   # make sure we're on a non-interactive backend
+
 
 st.set_page_config(page_title="FENRIR Dashboard", page_icon="🐺", layout="wide")
 st.title("🐺 FENRIR — Real-Time Guidance Demo")
@@ -161,13 +167,20 @@ mp = np.array(st.session_state.missile_path) if st.session_state.missile_path el
 tp = np.array(st.session_state.target_path) if st.session_state.target_path else None
 
 with plot_area:
+
+    st.subheader(f"Top-Down Trajectories — {scenario}")
+
     fig, ax = plt.subplots(figsize=(6.5, 6.5))
+
+    drew_anything = False
     if tp is not None and len(tp) > 1:
         ax.plot(tp[:, 0], tp[:, 1], '--', label='Target path')
         ax.scatter(tp[-1, 0], tp[-1, 1], marker='x', s=80, label='Target now')
+        drew_anything = True
     if mp is not None and len(mp) > 1:
         ax.plot(mp[:, 0], mp[:, 1], '-', label='Missile path')
         ax.scatter(mp[-1, 0], mp[-1, 1], s=80, label='Missile now')
+        drew_anything = True
     if st.session_state.hit and mp is not None and len(mp) > 0:
         ax.scatter(mp[-1, 0], mp[-1, 1], s=120, facecolors='none',
                    edgecolors='k', linewidths=2, label='Hit')
@@ -175,14 +188,46 @@ with plot_area:
             plt.Circle((mp[-1, 0], mp[-1, 1]), st.session_state.hit_radius,
                        fill=False, linestyle=':', linewidth=1)
         )
+        drew_anything = True
+
+    # sensible default view so first frames aren’t microscopic
+    world = st.session_state.world
+    missile, target = world.entities[0], world.entities[1]
+    rel = target.state.r - missile.state.r
+    dist = float(np.linalg.norm(rel))
+    span = max(1000.0, dist * 1.2)
+    cx = float((missile.state.r[0] + target.state.r[0]) / 2.0)
+    cy = float((missile.state.r[1] + target.state.r[1]) / 2.0)
+    ax.set_xlim(cx - span, cx + span)
+    ax.set_ylim(cy - span, cy + span)
 
     ax.set_xlabel("X (m)")
     ax.set_ylabel("Y (m)")
-    ax.set_title(f"Top-Down Trajectories — {scenario}")
-    ax.axis('equal')
+    ax.set_aspect('equal', adjustable='box')
     ax.grid(True, alpha=0.3)
-    ax.legend(loc='best')
-    st.pyplot(fig, clear_figure=True)
+    if drew_anything:
+        ax.legend(loc='best')
+
+    # render to PNG bytes (robust across Streamlit versions)
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=150, bbox_inches="tight")
+    png_bytes = buf.getvalue()
+    plt.close(fig)
+
+    # Fixed-height HTML container to avoid collapsed render
+    b64 = base64.b64encode(png_bytes).decode("ascii")
+    html(
+        f"""
+        <div style="width:100%; height:560px; background:#0b0b0b10; border-radius:8px; overflow:hidden;">
+        <img src="data:image/png;base64,{b64}"
+            style="width:100%; height:100%; object-fit:contain; display:block;" />
+        </div>
+        """,
+        height=580,   # slightly bigger to ensure full visibility
+    )
+
+
+
 
 # ---------- telemetry readouts ----------
 with readout:
