@@ -53,22 +53,54 @@ Fenrir/
 
 ### Prerequisites
 - Python ≥ 3.10  
-- [Poetry](https://python-poetry.org/) or `pip`  
+- Git
+- Either [Poetry](https://python-poetry.org/) or `pip`  
 - Streamlit, Matplotlib, NumPy, Pandas
 
+```text
+Windows tip: Use PowerShell as admin for installs.
+macOS tip: If using Homebrew Python, prefer python3 and pip3.
+```
+
 ### Installation
+
+#### Pick a folder you like, then:
 ```bash
 git clone https://github.com/TheVenetianWolf/Fenrir.git
 cd Fenrir
-poetry install        # or: pip install -r requirements.txt
+```
+
+#### Install dependencies into a virtualenv Poetry manages for you
+```bash
+poetry install
 ```
 
 ### Run Dashboard
 ```bash
-streamlit run ui/streamlit_app.py
+poetry run streamlit run ui/streamlit_app.py
 ```
 
-Open URL provided
+Then Open URL provided (Usually streamlit opens it automatically)
+
+### For pip and venv
+```bash
+# Create & activate a virtual environment
+python -m venv .venv
+# macOS/Linux:
+source .venv/bin/activate
+# Windows PowerShell:
+# .\.venv\Scripts\Activate.ps1
+
+# Install dependencies
+pip install -r requirements.txt  # If present
+# If not present, install the core deps:
+# pip install streamlit numpy pandas matplotlib scipy
+```
+
+### Run the app
+```bash
+streamlit run ui/streamlit_app.py
+```
 
 ## Contributing
 Pull requests and ideas are welcome!
