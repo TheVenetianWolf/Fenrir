@@ -1,0 +1,40 @@
+# ------------------------------------------------------------
+# FENRIR Scenario Preset: Proportional Navigation Intercept
+#
+# This file defines a basic missile–target setup for the FENRIR
+# simulation engine. Presets allow users to load configuration
+# parameters from disk instead of editing Python code.
+#
+# Author: Matteo Da Venezia
+# ------------------------------------------------------------
+
+metadata:
+  name: "Proportional Navigation Intercept"
+  description: "Baseline intercept scenario with PN guidance in still air."
+  version: 1.0
+  tags: ["PN", "intercept", "default"]
+
+world:
+  wind: [0.0, 0.0]   # [m/s] constant wind vector (x, y)
+
+missile:
+  mass: 50.0          # [kg]
+  position: [0.0, 0.0]  # [m]
+  velocity: [300.0, 0.0] # [m/s]
+  guidance:
+    type: "ProportionalNavigation"
+    N: 3.5
+  dynamics:
+    type: "BasicMissileDynamics"
+    amax: 50.0
+    drag:
+      model: "QuadraticDrag"
+      Cd: 0.6
+      A: 0.015
+      rho: 1.225
+
+target:
+  mass: 200.0
+  position: [4000.0, 800.0]
+  velocity: [-150.0, 0.0]
+  behaviour: "ConstantVelocity"

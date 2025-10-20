@@ -1,4 +1,8 @@
-# 🐺 FENRIR: Defense Simulation Dashboard
+<p align="center">
+  <img src="assets/logo.png" alt="FENRIR Logo" width="400" style="border-radius: 12px;"/>
+</p>
+
+# 🐺 FENRIR: Defence Simulation Dashboard
 
 **FENRIR** is an open-source, real-time missile guidance simulation dashboard built with **Python** and **Streamlit**.  
 It visualises pursuit and intercept dynamics in a clean, interactive interface designed for education, research, and experimentation.
