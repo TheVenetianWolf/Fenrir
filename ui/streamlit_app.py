@@ -36,6 +36,21 @@ matplotlib.use("Agg")
 
 # --- page / header -------------------------------------------------------------
 st.set_page_config(page_title="FENRIR Dashboard", page_icon="🐺", layout="wide")
+from pathlib import Path
+
+# Load and display logo if available
+logo_path = Path(__file__).parent.parent / "assets" / "logo.png"
+if logo_path.exists():
+    st.markdown(
+        f"""
+        <div style="text-align: center; margin-bottom: -10px;">
+            <img src="data:image/png;base64,{base64.b64encode(logo_path.read_bytes()).decode()}" 
+                 alt="FENRIR Logo" width="260" style="border-radius: 12px;"/>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 st.title("🐺 FENRIR — Real-Time Guidance Demo")
 
 # ---- imports from project ----
@@ -501,3 +516,10 @@ if st.session_state.get("running") and st.session_state.i < st.session_state.ste
     delay = 1.0 / max(1, int(fps))
     time.sleep(delay)  # throttle to target FPS
     st.rerun()
+
+
+st.markdown(
+    "<hr style='margin-top: 30px; opacity: 0.3;'/>"
+    "<p style='text-align:center; font-size: 0.85em;'>FENRIR Defence Simulation Dashboard — Open Source © 2025</p>",
+    unsafe_allow_html=True,
+)
