@@ -1,4 +1,4 @@
-# 🐺 FENRIR — Defense Simulation Dashboard
+# 🐺 FENRIR: Defense Simulation Dashboard
 
 **FENRIR** is an open-source, real-time missile guidance simulation dashboard built with **Python** and **Streamlit**.  
 It visualises pursuit and intercept dynamics in a clean, interactive interface designed for education, research, and experimentation.
@@ -64,16 +64,11 @@ poetry install        # or: pip install -r requirements.txt
 ```
 
 ### Run Dashboard
+```bash
 streamlit run ui/streamlit_app.py
+```
 
 Open URL provided
-
-## Roadmap
-[]Add rotating radar visualisation panel
-[]Implement advanced guidance (PN+, APN, PP)
-[]Include noise / delay models
-[]Multi-target or cooperative intercept demo
-[]Export plots as images or animated GIFs
 
 ## Contributing
 Pull requests and ideas are welcome!
@@ -85,9 +80,10 @@ This project is released under the MIT License (see LICENSE)
 
 ## Citation
 If you use FENRIR in research or teaching, please credit it as:
-
+```text
 FENRIR: Open-Source Defense Simulation Dashboard, 2025
 https://github.com/TheVenetianWolf/Fenrir
+```
 
 ## 🐾 Acknowledgements
 Inspired by classical missile guidance theory and the curiosity to visualise physics beautifully.
