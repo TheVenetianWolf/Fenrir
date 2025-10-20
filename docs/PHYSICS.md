@@ -138,11 +138,12 @@ It’s a playground for anyone curious about how guidance systems think and reac
 ## 📚 Further Reading
 
 If you’d like to dive deeper into the ideas behind FENRIR, here are some beginner-friendly resources:
+
 - Missile Guidance for Beginners – Defense Acquisition University (US) – a short overview explaining proportional navigation in plain terms.
--“Proportional Navigation Made Simple” by P. Zarchan – an excellent chapter from Tactical and Strategic Missile Guidance, written clearly even for non-engineers.
--“How Do Missiles Lock On?” – MinutePhysics video on YouTube, showing how geometry and timing drive interception.
--“The Pursuit Curve” – Mathematical article on how pursuers (dogs, insects, robots) naturally trace curved paths when chasing a target.
--NASA Glenn Research Center – Basics of Flight – concise explanations of drag, lift, and acceleration.
+- “Proportional Navigation Made Simple” by P. Zarchan – an excellent chapter from Tactical and Strategic Missile Guidance, written clearly even for non-engineers.
+- “How Do Missiles Lock On?” – MinutePhysics video on YouTube, showing how geometry and timing drive interception.
+- “The Pursuit Curve” – Mathematical article on how pursuers (dogs, insects, robots) naturally trace curved paths when chasing a target.
+- NASA Glenn Research Center – Basics of Flight – concise explanations of drag, lift, and acceleration.
 
 You don’t need a background in maths to enjoy these.
 They show how the same geometry that guides a missile also governs the flight of a hawk, the path of a robot vacuum, or even the strategy of a football defender.
