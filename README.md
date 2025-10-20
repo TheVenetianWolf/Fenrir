@@ -3,9 +3,10 @@
 </p>
 
 # 🐺 FENRIR: Defence Simulation Dashboard
+## Real-time missile guidance and intercept simulation, visualised through physics, mathematics, and code.
 
-**FENRIR** is an open-source, real-time missile guidance simulation dashboard built with **Python** and **Streamlit**.  
-It visualises pursuit and intercept dynamics in a clean, interactive interface designed for education, research, and experimentation.
+FENRIR is an open-source, real-time missile guidance simulation dashboard built with Python and Streamlit.
+It visualises pursuit and intercept dynamics in an interactive, educational interface designed for research, analysis, and experimentation.
 
 ---
 
@@ -23,10 +24,10 @@ It visualises pursuit and intercept dynamics in a clean, interactive interface d
 
 ## 🧠 Concept
 
-FENRIR demonstrates how simple missile guidance laws behave in dynamic pursuit.  
-The simulation integrates missile and target kinematics, updating in real time as parameters (navigation constant `N`, max acceleration, time step, etc.) are changed.
+FENRIR demonstrates how classical missile guidance laws behave in dynamic pursuit scenarios.
+The simulation integrates missile and target kinematics in real time, allowing you to adjust key parameters such as the navigation constant N, maximum acceleration, and time step to see their effects instantly.
 
-The name **FENRIR** is inspired by the mythic wolf from Norse legend, a symbol of relentless pursuit.
+The name FENRIR comes from Norse mythology, the wolf destined to break its chains, symbolising relentless pursuit and unstoppable motion.
 
 ---
 
@@ -37,7 +38,9 @@ Fenrir/
 │
 ├── core/                  # Physics and entity definitions
 │   ├── engine.py
-│   └── entities.py
+│   ├── entities.py
+│   ├── dynamics.py
+│   └── guidance.py
 │
 ├── services/              # Scenario definitions and helpers
 │   ├── scenarios.py
@@ -66,7 +69,7 @@ Windows tip: Use PowerShell as admin for installs.
 macOS tip: If using Homebrew Python, prefer python3 and pip3.
 ```
 
-### Installation
+## Installation
 
 #### Pick a folder you like, then:
 ```bash
@@ -84,7 +87,7 @@ poetry install
 poetry run streamlit run ui/streamlit_app.py
 ```
 
-Then Open URL provided (Usually streamlit opens it automatically)
+Then Open URL provided (Usually streamlit opens it automatically in your default web browser)
 
 ### For pip and venv
 ```bash
@@ -109,10 +112,11 @@ streamlit run ui/streamlit_app.py
 ## Contributing
 Pull requests and ideas are welcome!
 Please fork the repository and submit a PR with clear commit messages.
-Discussions about physics, simulation fidelity, or UX are encouraged.
+Discussions about physics modelling, simulation fidelity, or user experience are encouraged.
 
 ## License
-This project is released under the MIT License (see LICENSE)
+This project is released under the MIT License.
+See LICENSE file for details.
 
 ## Citation
 If you use FENRIR in research or teaching, please credit it as:
