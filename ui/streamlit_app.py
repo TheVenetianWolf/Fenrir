@@ -7,6 +7,8 @@ import streamlit as st
 import io
 import base64
 import matplotlib
+import math
+from matplotlib.patches import Wedge, Circle
 from streamlit.components.v1 import html
 matplotlib.use("Agg")   # make sure we're on a non-interactive backend
 
@@ -67,6 +69,73 @@ def reset_sim(scenario: str, N=3.0, amax=50.0, dt=0.05, T=30.0, hit_radius=10.0)
     st.session_state.missile_path = []
     st.session_state.target_path = []
     st.session_state.telemetry = []  # dicts per step
+    st.session_state.radar_echoes = []  # fading blips for radar
+
+def _angle_wrap(rad: float) -> float:
+    return (rad + np.pi) % (2*np.pi) - np.pi
+
+def draw_radar(ax, missile, target, t, echoes,
+               range_max=5000.0, sweep_rate_rps=0.35, fov_deg=70.0):
+    """Missile-centric radar with rotating sweep and fading echoes."""
+    ax.set_facecolor((0.03, 0.07, 0.09))
+    ax.set_aspect('equal', 'box')
+    ax.set_xlim(-range_max, range_max)
+    ax.set_ylim(-range_max, range_max)
+    ax.axis('off')
+
+    # Range rings + bearings
+    rings = 4
+    for k in range(1, rings+1):
+        r = range_max * k / rings
+        ax.add_patch(Circle((0,0), r, fill=False, lw=1, ec=(1,1,1,0.12)))
+    for deg in range(0, 360, 30):
+        rad = math.radians(deg)
+        ax.plot([0, range_max*math.cos(rad)], [0, range_max*math.sin(rad)],
+                lw=0.6, c=(1,1,1,0.08))
+
+    # Sweep wedge
+    phi = (t * 2*np.pi * sweep_rate_rps) % (2*np.pi)
+    half = math.radians(fov_deg) / 2.0
+    wedge = Wedge((0,0), range_max,
+                  math.degrees(phi - half), math.degrees(phi + half),
+                  facecolor=(0.2, 1.0, 0.6, 0.08),
+                  edgecolor=(0.2, 1.0, 0.6, 0.35), lw=1.2)
+    ax.add_patch(wedge)
+
+    # Crosshair at center (missile)
+    ax.add_patch(Circle((0,0), 45, fill=False, ec=(0.6,1,0.9,0.6), lw=1.2))
+    ax.plot([-60, 60], [0, 0], c=(0.6,1,0.9,0.4), lw=1.0)
+    ax.plot([0, 0], [-60, 60], c=(0.6,1,0.9,0.4), lw=1.0)
+
+    # Target relative position
+    rel = target.state.r - missile.state.r
+    r = float(np.linalg.norm(rel))
+    theta = math.atan2(rel[1], rel[0])
+
+    # Current bright blip (if in range)
+    if r <= range_max:
+        ax.scatter([rel[0]], [rel[1]], s=30, c=[(0.4,1.0,0.4,0.95)], zorder=5)
+        ax.scatter([rel[0]], [rel[1]], s=120, c=[(0.4,1.0,0.4,0.25)], zorder=4)
+
+    # Drop an echo when sweep passes the target
+    inside = (r <= range_max) and (abs(_angle_wrap(theta - phi)) <= half)
+    if inside:
+        echoes.append({"x": float(rel[0]), "y": float(rel[1]), "ttl": 1.0})
+
+    # Fade echoes
+    for e in echoes:
+        e["ttl"] *= 0.92
+    echoes[:] = [e for e in echoes if e["ttl"] > 0.05]
+    for e in echoes:
+        ax.scatter([e["x"]], [e["y"]], s=40,
+                   c=[(0.3, 1.0, 0.6, 0.35 * e["ttl"])])
+
+    # HUD text
+    ax.text(-range_max*0.98, -range_max*0.98, f"Rmax {int(range_max)} m",
+            color=(0.8,0.95,0.95,0.5), fontsize=9)
+
+    return echoes
+
 
 # ---------- sidebar controls ----------
 st.sidebar.header("Scenario & Parameters")
@@ -244,6 +313,38 @@ with readout:
 
     if st.session_state.hit:
         st.success(f"Hit! t={st.session_state.hit['t']:.2f}s, range={st.session_state.hit['range']:.2f} m")
+
+# ---------- radar panel ----------
+with top.container():
+    world = st.session_state.world
+    missile, target = world.entities[0], world.entities[1]
+    rng, _, _ = los_metrics(missile, target)
+    rmax = max(2000.0, float(rng) * 1.2)
+
+    st.subheader("Radar — Missile-Centric")
+
+    fig_r, ax_r = plt.subplots(figsize=(6.5, 4.5))
+    st.session_state.radar_echoes = draw_radar(
+        ax_r, missile, target, world.t,
+        st.session_state.get("radar_echoes", []),
+        range_max=rmax, sweep_rate_rps=0.4, fov_deg=70.0
+    )
+
+    buf_r = io.BytesIO()
+    fig_r.savefig(buf_r, format="png", dpi=150, bbox_inches="tight")
+    plt.close(fig_r)
+    b64_r = base64.b64encode(buf_r.getvalue()).decode("ascii")
+
+    html(
+        f"""
+        <div style="width:100%; height:380px; background:#0b0b0b10; border-radius:8px; overflow:hidden;">
+          <img src="data:image/png;base64,{b64_r}"
+               style="width:100%; height:100%; object-fit:contain; display:block;" />
+        </div>
+        """,
+        height=400,
+    )
+
 
 # ---------- charts + export ----------
 with charts:
