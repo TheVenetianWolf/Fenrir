@@ -7,10 +7,14 @@ class Entity:
         self.state = state
 
 class Missile(Entity):
-    def __init__(self, state, guidance, amax=50.0):
+    def __init__(self, state, guidance, dynamics, amax=50.0):
         super().__init__(state)
         self.guidance = guidance
+        self.dynamics = dynamics
         self.amax = amax
+        self.last_a_cmd = 0.0
+        self.last_a_lat = 0.0
+        self.last_a_achieved = 0.0
 
 class Target(Entity):
     pass
@@ -22,22 +26,22 @@ class World:
         self.t = 0.0
 
     def step(self, dt):
-        # very simple integrator: apply guidance lateral accel to missile as a perpendicular accel
         missile = next((e for e in self.entities if isinstance(e, Missile)), None)
-        target = next((e for e in self.entities if isinstance(e, Target)), None)
-        if missile and target:
-            cmd = missile.guidance.command(missile, target, self)
-            a_lat = np.clip(cmd.get("a_lat", 0.0), -missile.amax, missile.amax)
-            # Rotate velocity slightly by lateral accel approximation:
-            # v_new = v + a_lat * dt * n_hat, where n_hat is perpendicular to velocity
-            v = missile.state.v
-            speed = np.linalg.norm(v) + 1e-9
-            n_hat = np.array([-v[1], v[0]]) / speed
-            missile.state.v = missile.state.v + a_lat * dt * n_hat
-            missile.state.r = missile.state.r + missile.state.v * dt
+        target  = next((e for e in self.entities if isinstance(e, Target)), None)
 
-        # move target (constant velocity)
+        if hasattr(self, "step_target_fn") and target:
+            self.step_target_fn(self.t, dt)
+
         if target:
+            # constant-velocity target (can be replaced by a behavior fn)
             target.state.r = target.state.r + target.state.v * dt
+
+        if missile and target:
+            # guidance produces lateral accel command (scalar)
+            cmd = missile.guidance.command(missile, target, self)
+            missile.last_a_cmd = float(np.clip(cmd.get("a_lat", 0.0), -missile.amax, missile.amax))
+            # integrate with dynamics
+            missile.dynamics.amax = missile.amax
+            missile.dynamics.step(missile, dt)
 
         self.t += dt
